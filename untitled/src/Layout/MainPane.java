@@ -1,17 +1,21 @@
 package Layout;
 
+import Core.*;
 import javafx.scene.layout.Pane;
 
-public class MainPane extends Pane {
+public class MainPane extends Pane implements ThreadListener {
 
-    TetrisBoard mainBoard = new TetrisBoard();
+    TetrisBoardView mainBoardView = new TetrisBoardView( new TetrisBoardModel() );
     HeldPiecePane heldPiecePane = new HeldPiecePane();
     NextPiecePane nextPiecePane = new NextPiecePane();
     ScorePane scorePane = new ScorePane();
 
+    Piece currentPiece;
+    Piece nextPiece;
+
     public MainPane() {
-        super.getChildren().addAll( mainBoard, heldPiecePane, nextPiecePane, scorePane );
-        mainBoard.getInPosition();
+        super.getChildren().addAll( mainBoardView, heldPiecePane, nextPiecePane, scorePane );
+        mainBoardView.getInPosition();
         nextPiecePane.getInPosition();
         heldPiecePane.getInPosition();
         scorePane.getInPosition();
@@ -19,4 +23,30 @@ public class MainPane extends Pane {
         setStyle( "-fx-background-color:rgb( 3, 54, 73 );");
     }
 
+    public TetrisBoardView getTetrisBoardView() {
+        return mainBoardView;
+    }
+
+    public void launchGame() {
+        currentPiece = PieceFactory.getPiece();
+        currentPiece.register( mainBoardView );
+        currentPiece.attachBoardView( mainBoardView );
+        nextPiece = PieceFactory.getPiece();
+        nextPiece.register( mainBoardView );
+        nextPiece.attachBoardView( mainBoardView );
+        PieceMovingThread thread = new PieceMovingThread( currentPiece );
+        thread.register( this );
+        thread.start();
+    }
+
+    @Override
+    public void doneAnimating() {
+        currentPiece = nextPiece;
+        nextPiece = PieceFactory.getPiece();
+        nextPiece.register( mainBoardView );
+        nextPiece.attachBoardView( mainBoardView );
+        PieceMovingThread thread = new PieceMovingThread( currentPiece );
+        thread.register( this );
+        thread.start();
+    }
 }

@@ -1,41 +1,49 @@
 package Layout;
 
+import Core.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import Core.Piece;
-import Core.I;
-import Core.O;
+import java.util.ArrayList;
+import java.util.Iterator;
 
-public class TetrisBoard extends Pane {
+public class TetrisBoardView extends Pane implements PieceListener {
 
     private Canvas canvas = new Canvas( 200, 400 );
     private GraphicsContext drawingArea = canvas.getGraphicsContext2D();
     private final int NUMBER_OF_ROWS = 40;
     private final int NUMBER_OF_COLUMNS = 20;
 
-    public TetrisBoard() {
+    private ArrayList<Piece> piecesCurrentlyOnTheBoard = new ArrayList<>();;
+
+    private TetrisBoardModel model;
+
+    public TetrisBoardView( TetrisBoardModel model ) {
         super.getChildren().addAll( canvas );
-        fillDrawingArea();
+        this.model = model;
+        draw();
     }
+
+    public void draw() {
+        fillDrawingArea();
+        drawPieces();
+    }
+
+    public void drawPieces() {
+        Iterator i = piecesCurrentlyOnTheBoard.iterator();
+        while ( i.hasNext() ) {
+            Piece piece = ( Piece ) i.next();
+            piece.draw( drawingArea );
+        }
+    }
+
+
 
     private void fillDrawingArea() {
         fillCanvas();
         drawGrid();
-        Piece i = new I( this );
-        Piece o = new O( this );
-        i.proceedToTheNextConfiguration();
-
-
-        for ( int j = 0; j < 5; j++ ) {
-            i.moveLeft();
-            i.moveDown();
-        }
-
-        i.draw( drawingArea );
-        o.draw( drawingArea );
     }
 
     private void fillCanvas() {
@@ -52,6 +60,10 @@ public class TetrisBoard extends Pane {
             drawingArea.strokeLine( col*10, 0, col*10, canvas.getHeight() );
     }
 
+    public void addPiece( Piece piece ) {
+        piecesCurrentlyOnTheBoard.add( piece );
+    }
+
     public void getInPosition() {
         relocate( 150, 50 );
     }
@@ -63,4 +75,23 @@ public class TetrisBoard extends Pane {
     public int getNumberOfColumns() {
         return NUMBER_OF_COLUMNS;
     }
+
+    @Override
+    public void pieceMoved() {
+        draw();
+    }
+
+    public GraphicsContext getGraphicsContext() {
+        return drawingArea;
+    }
+
+    public void markPiecePositionAsOccupied( Piece piece ) {
+        model.markPiecePositionAsOccupied( piece );
+    }
+
+    public boolean positionIsOccupied( int row, int col ) {
+        return model.positionIsOccupied( row, col );
+    }
+
+
 }

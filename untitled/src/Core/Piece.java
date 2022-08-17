@@ -1,12 +1,12 @@
 package Core;
 
-import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
-import Layout.TetrisBoard;
+import Layout.TetrisBoardView;
 
 /**
  * A piece is represented internally by a 5*5 array of integers with 1 indicating
@@ -26,17 +26,19 @@ public abstract class Piece {
     private int ROW_ON_TETRIS_BOARD = 0;
     private int COLUMN_ON_TETRIS_BOARD = 9;
 
-    protected TetrisBoard tetrisBoard;
+    protected TetrisBoardView tetrisBoardView;
+    protected ArrayList<PieceListener> listeners = new ArrayList<>();
+
+    protected boolean pieceIsInValidPositionOnBoard = true;
+
+    public void attachBoardView( TetrisBoardView boardView ) {
+        this.tetrisBoardView = boardView;
+    }
 
     /**
      * Subclasses must initialize a list of possible configurations...
      */
     protected abstract void initializePossibleConfigurations();
-
-    /**
-     * Subclasses must initialize a tetris board on which they will draw themselves...
-     */
-    protected abstract void initializeTetrisBoard( TetrisBoard board );
 
     // A piece knows its current configuration...
     public int[][] getCurrentConfiguration() {
@@ -82,16 +84,94 @@ public abstract class Piece {
     public void moveLeft() {
         if ( COLUMN_ON_TETRIS_BOARD > 0 )
             COLUMN_ON_TETRIS_BOARD--;
+        notifyListeners();
+        draw( tetrisBoardView.getGraphicsContext() );
     }
 
     public void moveRight() {
-        if ( COLUMN_ON_TETRIS_BOARD < tetrisBoard.getNumberOfColumns() )
+        if ( COLUMN_ON_TETRIS_BOARD < tetrisBoardView.getNumberOfColumns() )
             COLUMN_ON_TETRIS_BOARD++;
+        notifyListeners();
+        draw( tetrisBoardView.getGraphicsContext() );
     }
 
     public void moveDown() {
-        if ( ROW_ON_TETRIS_BOARD < tetrisBoard.getNumberOfRows() )
-            ROW_ON_TETRIS_BOARD++;
+        ROW_ON_TETRIS_BOARD++;
+        if ( pieceHasLanded() || pieceHasLandedOnTopOfAnother() )
+            return;
+        notifyListeners();
+        draw( tetrisBoardView.getGraphicsContext() );
+    }
+
+    /**
+     * Note that the positions that this method and pieceHasLanded are checking are one row ahead of where
+     * the piece currently is. So if they return true, it means that the piece should remain where it is
+     * meaning we should decrease the row position i.e ROW_ON_TETRIS_BOARD--...
+     * @return
+     */
+    private boolean pieceHasLandedOnTopOfAnother() {
+        for ( int row = 0; row < getCurrentConfiguration().length; row++ )
+            for ( int col = 0; col < getCurrentConfiguration().length; col++ )
+                if ( getCurrentConfiguration()[row][col] == 1 && row + ROW_ON_TETRIS_BOARD < tetrisBoardView.getNumberOfRows() ) {
+                    if ( tetrisBoardView.positionIsOccupied( row + ROW_ON_TETRIS_BOARD, col+COLUMN_ON_TETRIS_BOARD ) ) {
+                        System.out.println( "Piece has landed on top of another piece..." );
+                        ROW_ON_TETRIS_BOARD--; // Move back to the previous row since this row is invalid...
+                        tetrisBoardView.markPiecePositionAsOccupied( this );
+                        pieceIsInValidPositionOnBoard = false;
+                        tetrisBoardView.addPiece( this );
+                        return true;
+                    }
+                }
+        return false;
+    }
+
+    private void notifyListeners() {
+        Iterator i = listeners.iterator();
+        while ( i.hasNext() ) {
+            PieceListener listener = ( PieceListener ) i.next();
+            listener.pieceMoved();
+        }
+    }
+
+    private boolean pieceHasLanded() {
+        int rowOfLastOccupiedTile = getRowOfLastOccupiedTile();
+        if ( ROW_ON_TETRIS_BOARD + rowOfLastOccupiedTile < tetrisBoardView.getNumberOfRows() )
+            return false;
+        System.out.println( ROW_ON_TETRIS_BOARD + rowOfLastOccupiedTile );
+        ROW_ON_TETRIS_BOARD--;  // Move back to the previous row since this row is invalid...
+        tetrisBoardView.markPiecePositionAsOccupied( this );
+        pieceIsInValidPositionOnBoard = false;
+        tetrisBoardView.addPiece( this );
+        return true;
+    }
+
+    private int getRowOfLastOccupiedTile() {
+        int rowOfLastOccupiedTile = 0;
+        for ( int row = 0; row < getCurrentConfiguration().length; row++ )
+            for ( int col = 0; col < getCurrentConfiguration().length; col++ )
+                if ( getCurrentConfiguration()[row][col] == 1 )
+                    rowOfLastOccupiedTile = row;
+        return rowOfLastOccupiedTile;
+    }
+
+    public boolean stillInValidPositionOnBoard() {
+        return pieceIsInValidPositionOnBoard;
+    }
+
+    public boolean positionIsOccupied( int row, int col ) {
+        return getCurrentConfiguration()[row][col] == 1;
+    }
+
+    public int getRowOnBoard() {
+        return ROW_ON_TETRIS_BOARD;
+    }
+
+    public int getColumnOnBoard() {
+        return COLUMN_ON_TETRIS_BOARD;
+    }
+
+    public void register( PieceListener listener ) {
+        listeners.add( listener );
     }
 
 }

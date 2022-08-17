@@ -2,7 +2,7 @@ package Core;
 
 import java.util.ArrayList;
 
-import Layout.TetrisBoard;
+import Layout.TetrisBoardView;
 
 public class I extends Piece {
 
@@ -22,9 +22,8 @@ public class I extends Piece {
             { 0, 0, 0, 0, 0 }
     };
 
-    public I( TetrisBoard board ) {
+    public I() {
         initializePossibleConfigurations();
-        initializeTetrisBoard( board );
     }
 
     @Override
@@ -34,11 +33,6 @@ public class I extends Piece {
         possibleConfigurations.add( configuration2 );
         currentConfiguration = possibleConfigurations.get( 0 );  // Start with the first configuration...
         System.out.println( "Size of configuration list: " + possibleConfigurations.size() );
-    }
-
-    @Override
-    protected void initializeTetrisBoard( TetrisBoard board ) {
-        tetrisBoard = board;
     }
 
 }

@@ -1,6 +1,6 @@
 package Core;
 
-import Layout.TetrisBoard;
+import Layout.TetrisBoardView;
 
 import javafx.scene.paint.Color;
 
@@ -10,11 +10,12 @@ public class O extends Piece {
 
     private int[][] configuration1 = new int[][] {
             { 1, 1, 0, 0, 0 },
-            { 1, 1, 0, 0, 0 }
+            { 1, 1, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0 }
     };
 
-    public O( TetrisBoard board ) {
-        initializeTetrisBoard( board );
+    public O() {
         initializePossibleConfigurations();
     }
 
@@ -23,11 +24,6 @@ public class O extends Piece {
         possibleConfigurations = new ArrayList<>();
         possibleConfigurations.add( configuration1 );
         currentConfiguration = possibleConfigurations.get( 0 );
-    }
-
-    @Override
-    protected void initializeTetrisBoard( TetrisBoard board ) {
-        tetrisBoard = board;
     }
 
     protected void setColor() {
