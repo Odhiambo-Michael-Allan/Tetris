@@ -14,7 +14,12 @@ public class Tetris extends Application {
     public void start( Stage stage ) {
 
         MainPane mainPane = new MainPane();
-        stage.setScene( new Scene( mainPane ) );
+        Scene scene = new Scene( mainPane );
+        scene.setOnKeyPressed( event -> {
+            System.out.println( "Key pressed..." );
+            mainPane.keyPressed( event );
+        } );
+        stage.setScene( scene );
         stage.setTitle( "Tetris 1.0" );
         stage.show();
 

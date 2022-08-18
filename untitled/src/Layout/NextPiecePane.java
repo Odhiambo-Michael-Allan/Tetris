@@ -6,6 +6,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.control.Label;
 
+import Core.Piece;
+
 public class NextPiecePane extends Pane {
 
     private Canvas canvas = new Canvas( 100, 100 );
@@ -27,5 +29,10 @@ public class NextPiecePane extends Pane {
 
     public void getInPosition() {
         relocate( 380, 100 );
+    }
+
+    public void display( Piece nextPiece ) {
+        fillDrawingArea();
+        nextPiece.draw( drawingArea );
     }
 }

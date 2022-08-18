@@ -16,14 +16,30 @@ public class TetrisBoardView extends Pane implements PieceListener {
     private final int NUMBER_OF_ROWS = 40;
     private final int NUMBER_OF_COLUMNS = 20;
 
+    private TetrisBoardController controller;
+
     private ArrayList<Piece> piecesCurrentlyOnTheBoard = new ArrayList<>();;
 
     private TetrisBoardModel model;
+
+    private Piece currentlyMovingPiece;
 
     public TetrisBoardView( TetrisBoardModel model ) {
         super.getChildren().addAll( canvas );
         this.model = model;
         draw();
+    }
+
+    public void attachController( TetrisBoardController controller ) {
+        this.controller = controller;
+    }
+
+    public void setCurrentlyMovingPiece( Piece piece ) {
+        this.currentlyMovingPiece = piece;
+    }
+
+    public Piece getCurrentlyMovingPiece() {
+        return this.currentlyMovingPiece;
     }
 
     public void draw() {

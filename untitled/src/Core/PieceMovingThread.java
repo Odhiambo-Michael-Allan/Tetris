@@ -18,7 +18,7 @@ public class PieceMovingThread extends Thread {
         while ( piece.stillInValidPositionOnBoard() ) {
             piece.moveDown();
             try {
-                Thread.sleep( 1000 );
+                Thread.sleep( 500 );
             } catch ( InterruptedException e ) {}
         }
         notifyListenersImDoneAnimating();

@@ -21,7 +21,6 @@ public class O extends Piece {
 
     @Override
     protected void initializePossibleConfigurations() {
-        possibleConfigurations = new ArrayList<>();
         possibleConfigurations.add( configuration1 );
         currentConfiguration = possibleConfigurations.get( 0 );
     }
