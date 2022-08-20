@@ -55,8 +55,6 @@ public class TetrisBoardView extends Pane implements PieceListener {
         }
     }
 
-
-
     private void fillDrawingArea() {
         fillCanvas();
         drawGrid();
@@ -105,8 +103,29 @@ public class TetrisBoardView extends Pane implements PieceListener {
         model.markPiecePositionAsOccupied( piece );
     }
 
+    public void markPiecePositionAsEmpty( Piece piece ) {
+        model.markPiecePositionAsEmpty( piece );
+    }
+
     public boolean positionIsOccupied( int row, int col ) {
         return model.positionIsOccupied( row, col );
+    }
+
+    public void notifyPiecesToRemoveThemselvesFromTheSpecifiedRows( ArrayList<Integer> filledRows ) {
+        for ( Integer row : filledRows )
+            for ( Piece piece : piecesCurrentlyOnTheBoard )
+                if ( piece.hasFilledPositionInRow( row ) )
+                    piece.removeFilledPositionsFromRow( row );
+    }
+
+    public void instructPiecesToShiftDownBy( int numberOfRows ) {
+        for ( Piece piece : piecesCurrentlyOnTheBoard ) {
+            piece.shiftDown(numberOfRows);
+        }
+    }
+
+    public void markPieceUpdatedPositionAsOccupied( Piece piece ) {
+        model.markPieceUpdatedPositionAsOccupied( piece );
     }
 
 

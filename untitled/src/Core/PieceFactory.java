@@ -30,7 +30,7 @@ public class PieceFactory {
                 chosenPiece = new L();
                 break;
         }
-        return chosenPiece;
+        return new I();
 
     }
 }

@@ -6,7 +6,8 @@ import javafx.scene.layout.Pane;
 
 public class MainPane extends Pane implements ThreadListener {
 
-    TetrisBoardView tetrisBoardView = new TetrisBoardView( new TetrisBoardModel() );
+    TetrisBoardModel tetrisBoardModel = new TetrisBoardModel();
+    TetrisBoardView tetrisBoardView = new TetrisBoardView(tetrisBoardModel);
     TetrisBoardController controller = new TetrisBoardController(tetrisBoardView);
     HeldPiecePane heldPiecePane = new HeldPiecePane();
     NextPiecePane nextPiecePane = new NextPiecePane();
@@ -18,6 +19,7 @@ public class MainPane extends Pane implements ThreadListener {
     public MainPane() {
         super.getChildren().addAll(tetrisBoardView, heldPiecePane, nextPiecePane, scorePane );
         super.setPrefSize( 500, 500 );
+        tetrisBoardModel.attachView( tetrisBoardView );
         tetrisBoardView.getInPosition();
         tetrisBoardView.attachController( controller );
         nextPiecePane.getInPosition();
